@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Audi Q5</title>
+<style>
+:root{--bg:#eef0f2;--card:#fff;--ink:#1c2227;--mute:#667078;--line:#d8dde1;--ok:#1d7a4a;--okbg:#e2f3ea;--bad:#b3261e;--badbg:#fbe6e4;--warn:#8a5a00;--warnbg:#fff1d1;--acc:#24303a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181b;--card:#1e2428;--ink:#e8ecef;--mute:#99a3aa;--line:#323a40;--ok:#6fd39b;--okbg:#17352a;--bad:#ff9a92;--badbg:#3d1f1d;--warn:#f0c15a;--warnbg:#3a2f12;--acc:#c9d3da;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14181b;--card:#1e2428;--ink:#e8ecef;--mute:#99a3aa;--line:#323a40;--ok:#6fd39b;--okbg:#17352a;--bad:#ff9a92;--badbg:#3d1f1d;--warn:#f0c15a;--warnbg:#3a2f12;--acc:#c9d3da;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px 14px 60px}
+h1{font-size:1.35rem;margin:6px 0 2px}
+.sub{color:var(--mute);margin:0 0 14px;font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+h2{font-size:1.05rem;margin:0 0 10px}
+label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:3px}
+input[type=text],input[type=number],input[type=password],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:.95rem}
+.chk input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--acc)}
+.chk small{color:var(--mute)}
+.miss span{color:var(--bad);font-weight:600}
+.off span{color:var(--warn);font-weight:600}
+.hd{align-items:center;margin-bottom:8px}.hd b{font-size:.95rem}.hd button[data-del]{margin-left:auto}
+.sec{font-weight:600;margin:12px 0 2px;font-size:.92rem}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:8px;cursor:pointer}
+button.primary{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.verdict{border-radius:8px;padding:10px 12px;margin-top:12px;font-size:.95rem}
+.v-ok{background:var(--okbg);color:var(--ok)}.v-bad{background:var(--badbg);color:var(--bad)}.v-warn{background:var(--warnbg);color:var(--warn)}
+.verdict b{font-size:1.05rem}
+.calc{margin:8px 0 0;padding:0;list-style:none;font-size:.88rem;color:var(--mute)}
+.calc li{display:flex;justify-content:space-between;padding:2px 0}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr.pick td{cursor:pointer}
+.p{color:var(--ok);font-weight:600}.n{color:var(--bad);font-weight:600}
+summary{cursor:pointer;font-weight:600}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Audi Q5</h1>
+
+<div class="card">
+<h2>Порівняння</h2>
+<div class="tw"><table id="sum"></table></div>
+</div>
+
+<div id="cars"></div>
+<div class="row" style="margin-bottom:14px"><button type="button" class="primary" id="add">+ Додати авто</button></div>
+
+<details class="card" hidden>
+<summary>Базова ціна і поправки</summary>
+<div id="gate" class="row" style="margin-top:10px"><input type="password" id="pw" placeholder="Пароль" inputmode="numeric" autocomplete="off" style="max-width:180px"><button id="pwb">Відкрити</button><span id="pwe" class="n"></span></div>
+<div id="setwrap" hidden>
+<div class="row" style="margin:10px 0"><button id="lockb">🔒 Заблокувати</button></div>
+<p class="sub">База: Prestige, 2021, пробіг 30–60 тис. км, цілі подушки, легкий удар спереду, є антихром і диски 20 — за це беремо:</p>
+<div class="grid" id="set"></div></div>
+</details>
+</main>
+
+<script>
+const DEF={base:16400,baseYear:2021,perYear:500,noWheels:500,noChrome:500,plusGap:200,noSport:200,perKm:100,baseKm:60,lowKm:30,bonusKm:100,airWheel:200,airCurt:400,airSeat:300,minYear:2021,maxYear:2024};
+const SET_LABELS={base:"Базова ціна, $",baseYear:"Базовий рік",perYear:"$ за рік (±)",noWheels:"Мінус без дисків 20, $",noChrome:"Мінус без антихрому, $",plusGap:"Мінус, якщо не Prestige (Premium Plus), $",noSport:"Мінус, якщо не Sportback, $",perKm:"Мінус $ за кожні 10 тис. км понад поріг",baseKm:"Поріг пробігу, з якого мінус, тис. км",lowKm:"Поріг малого пробігу, нижче якого плюс, тис. км",bonusKm:"Плюс $ за кожні 10 тис. км нижче порогу",airWheel:"Мінус, якщо стріляло кермо, $",airCurt:"Мінус, якщо стріляли шторки, $",airSeat:"Мінус, якщо стріляли сидіння, $",minYear:"Рік від",maxYear:"Рік до"};
+const MUST=[
+["rd","Run and Drive"],["color","Колір: темно-сірий або чорний"],["int","Салон чорний"],
+["cam","Камери 360"],["seats","Спортивні сидіння"],["vent","Вентиляція сидінь"],["sline","S-line"],
+["str","Без пошкоджень силових / підсилюючих елементів"],["bags","Подушка в торпедо не стріляла"],["glass","Лобове ціле"]];
+const OPT=[["wheels","Диски 20"],["chrome","Антихром (чорний пакет)"]];
+let S,cars,pend=null;
+try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem("q5set10")||"{}"));cars=JSON.parse(localStorage.getItem("q5cars")||"[]")}catch(e){S={...DEF};cars=[]}
+const save=()=>{try{localStorage.setItem("q5set10",JSON.stringify(S));localStorage.setItem("q5cars",JSON.stringify(cars))}catch(e){}};
+const fmt=v=>(v<0?"−":"")+"$"+Math.abs(Math.round(v)).toLocaleString("en-US");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function newCar(){const c={id:Date.now(),name:"",year:2022,trim:"Prestige",body:"Sportback",km:50,must:{},opt:{wheels:true,chrome:true},air:{}};cars.push(c);return c}
+function calc(c){
+ const fails=MUST.filter(([k])=>!c.must[k]).map(x=>x[1]);
+ if(c.year<S.minYear||c.year>S.maxYear)fails.push("Рік поза діапазоном "+S.minYear+"–"+S.maxYear);
+ const lines=[["База",S.base]];
+ const dy=(c.year-S.baseYear)*S.perYear; if(dy)lines.push([c.year+" vs "+S.baseYear,dy]);
+ if(c.trim==="Premium Plus"&&S.plusGap)lines.push(["Premium Plus",-S.plusGap]);
+ if(c.body==="Звичайний Q5"&&S.noSport)lines.push(["Не Sportback",-S.noSport]);
+ const dk=Math.round((c.km-S.baseKm)/10*S.perKm); if(dk>0)lines.push(["Пробіг "+c.km+" тис.",-dk]);
+ const bk=Math.round((S.lowKm-c.km)/10*S.bonusKm); if(bk>0)lines.push(["Малий пробіг "+c.km+" тис.",bk]);
+ const a=c.air||{};
+ if(a.wheel)lines.push(["Стріляло кермо",-S.airWheel]);
+ if(a.curt)lines.push(["Стріляли шторки",-S.airCurt]);
+ if(a.seat)lines.push(["Стріляли сидіння",-S.airSeat]);
+ if(!c.opt.wheels)lines.push(["Без дисків 20",-S.noWheels]);
+ if(!c.opt.chrome)lines.push(["Без антихрому",-S.noChrome]);
+ const fair=lines.reduce((a,l)=>a+l[1],0);
+ return{fails,lines,fair};
+}
+function render(){
+ document.getElementById("set").innerHTML=Object.keys(DEF).map(k=>`<div><label for="s_${k}">${SET_LABELS[k]}</label><input type="number" id="s_${k}" data-s="${k}" value="${S[k]}"></div>`).join("")+`<div><button id="rs">Скинути до стандартних</button></div>`;
+ document.getElementById("cars").innerHTML=cars.map(c=>{
+  const r=calc(c);let v;
+  if(r.fails.length)v=`<div class="verdict v-bad"><b>⚠ Увага: не виконано обов’язкове</b><br>${r.fails.map(esc).join("<br>")}</div>`;
+  else v=`<div class="verdict v-ok"><b>Усе обов’язкове є. Орієнтовна макс ціна: ${fmt(r.fair)}</b></div>`;
+  
+  return`<section class="card" data-id="${c.id}"><div class="row hd"><button data-col="${c.id}">${c.col?"▸ Розгорнути":"▾ Згорнути"}</button><b>${esc(c.name||"Без назви")} · ${c.year} · ${fmt(r.fair)} · ${r.fails.length?"⚠ "+r.fails.length:"✓"}</b><button data-del="${c.id}" aria-label="Видалити"${pend==c.id?' style="color:var(--bad);border-color:var(--bad)"':''}>${pend==c.id?"Точно видалити?":"✕ Видалити"}</button></div><div${c.col?" hidden":""}>
+  <div class="grid">
+   <div style="grid-column:1/-1"><label>Назва / посилання</label><input type="text" data-f="name" value="${esc(c.name)}" placeholder="Напр. Copart лот 123 / посилання"></div>
+   <div><label>Рік</label><input type="number" data-f="year" value="${c.year}"></div>
+   <div><label>Комплектація</label><select data-f="trim">${["Prestige","Premium Plus"].map(t=>`<option value="${t}"${t===c.trim?" selected":""}>${t}${t==="Premium Plus"&&S.plusGap?" (−"+S.plusGap+" $)":""}</option>`).join("")}</select></div>
+   <div><label>Кузов</label><select data-f="body">${["Sportback","Звичайний Q5"].map(t=>`<option value="${t}"${t===(c.body||"Sportback")?" selected":""}>${t}${t!=="Sportback"&&S.noSport?" (−"+S.noSport+" $)":""}</option>`).join("")}</select></div>
+   <div><label>Пробіг, тис. км</label><input type="number" step="5" data-f="km" value="${c.km}"></div>
+   
+  </div>
+  <div class="sec">Обов’язкове</div>
+  ${MUST.map(([k,t])=>`<label class="chk${c.must[k]?"":" miss"}"><input type="checkbox" data-m="${k}"${c.must[k]?" checked":""}><span>${t}</span></label>`).join("")}
+  <div class="sec">Які подушки стріляли</div>
+  ${[["wheel","Кермо",S.airWheel],["curt","Шторки",S.airCurt],["seat","Сидіння",S.airSeat]].map(([k,t,p])=>`<label class="chk"><input type="checkbox" data-a="${k}"${(c.air||{})[k]?" checked":""}><span>${t} <small>(−${fmt(p).replace("$","")} $)</small></span></label>`).join("")}
+  <div class="sec">Опціонально (без галочки — мінус)</div>
+  ${OPT.map(([k,t])=>`<label class="chk${c.opt[k]?"":" off"}"><input type="checkbox" data-o="${k}"${c.opt[k]?" checked":""}><span>${t}: ${c.opt[k]?"є":"немає"} <small>${c.opt[k]?"(без мінуса)":"(−"+(k==="wheels"?S.noWheels:S.noChrome)+" $)"}</small></span></label>`).join("")}
+  ${v}
+  <ul class="calc">${r.lines.slice(1).map(l=>`<li><span>${esc(l[0])}</span><span>${fmt(l[1])}</span></li>`).join("")}<li><b>Орієнтовна макс ціна</b><b>${fmt(r.fair)}</b></li></ul>
+  <div class="row" style="margin-top:10px"><button data-del="${c.id}"${pend==c.id?' style="color:var(--bad);border-color:var(--bad)"':''}>${pend==c.id?"Точно видалити?":"Видалити"}</button></div></div>
+  </section>`}).join("")||`<div class="card sub">Поки немає авто. Натисни «Додати авто».</div>`;
+ const rows=cars.map((c,i)=>{const r=calc(c);return{c,r,i}}).sort((a,b)=>(a.r.fails.length>0)-(b.r.fails.length>0)||(a.r.fair-b.r.fair));
+ document.getElementById("sum").innerHTML=cars.length?`<tr><th>Авто</th><th>Рік</th><th>Км</th><th>Орієнтовна макс ціна</th><th>Статус</th></tr>`+rows.map(({c,r})=>`<tr class="pick" data-go="${c.id}"><td>${esc(c.name||"Без назви")}</td><td>${c.year}</td><td>${c.km}</td><td>${fmt(r.fair)}</td><td>${r.fails.length?`<span class="n">✗ ${r.fails.length}</span>`:`<span class="p">✓</span>`}</td></tr>`).join(""):`<tr><td class="sub">Порожньо</td></tr>`;
+}
+document.addEventListener("input",e=>{
+ const t=e.target,s=t.closest("section");
+ if(t.dataset.s){S[t.dataset.s]=+t.value||0;save();update(null);return}
+ if(!s)return;const c=cars.find(x=>x.id==s.dataset.id);
+ if(t.dataset.f){c[t.dataset.f]=t.type==="number"?+t.value:t.value}
+ if(t.dataset.m)c.must[t.dataset.m]=t.checked;
+ if(t.dataset.o)c.opt[t.dataset.o]=t.checked;
+ if(t.dataset.a){c.air=c.air||{};c.air[t.dataset.a]=t.checked}
+ save();update(t);
+});
+async function unlock(){const p=document.getElementById("pw");let h="";try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("q5salt:"+p.value));h=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){}if(h==="7fa3eb4e6014b526085fc80fc352e0ae832262a151030f671ba86cc1a4c35b7d"){document.getElementById("gate").hidden=true;document.getElementById("setwrap").hidden=false;p.value="";document.getElementById("pwe").textContent=""}else{document.getElementById("pwe").textContent="Невірний пароль";p.value=""}}
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="pw")unlock()});
+window.addEventListener("error",e=>{let d=document.getElementById("err");if(!d){d=document.createElement("div");d.id="err";d.className="verdict v-bad";document.querySelector("main").prepend(d)}d.textContent="Помилка: "+e.message});
+// re-render without losing focus on text inputs
+function update(t){
+ if(t&&t.type!=="checkbox"&&t.tagName!=="SELECT"){const sec=t.closest("section");const pos=[...document.querySelectorAll("input,select")].indexOf(t);const sel=t.selectionStart;render();const el=[...document.querySelectorAll("input,select")][pos];if(el){el.focus();try{el.setSelectionRange(sel,sel)}catch(e){}}}
+ else{const y=scrollY;render();scrollTo(0,y)}
+}
+document.addEventListener("click",e=>{
+ const b=e.target.closest?(e.target.closest("button,tr")||e.target):e.target;
+ if(b.id==="add"){const c=newCar();save();render();const el=document.querySelector(`section[data-id="${c.id}"]`);if(el)el.scrollIntoView({block:"start"})}
+ if(b.dataset.del){const id=b.dataset.del;if(pend==id){cars=cars.filter(c=>c.id!=id);pend=null;save();render()}else{pend=id;render();setTimeout(()=>{if(pend==id){pend=null;render()}},4000)}}
+ if(b.id==="rs"){S={...DEF};save();render()}
+ if(b.id==="pwb")unlock();
+ if(b.id==="lockb"){document.getElementById("setwrap").hidden=true;document.getElementById("gate").hidden=false;document.getElementById("pw").value="";document.getElementById("pwe").textContent=""}
+ if(b.dataset.col){const c=cars.find(x=>x.id==b.dataset.col);c.col=!c.col;save();render()}
+ const tr=b.closest("tr[data-go]");if(tr){const el=document.querySelector(`section[data-id="${tr.dataset.go}"]`);if(el)el.scrollIntoView({behavior:"smooth"})}
+});
+render();
+</script>
+</body>
+</html>
